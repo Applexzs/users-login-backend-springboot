@@ -1,0 +1,59 @@
+package com.applexzs.backend.usersapp.controllers;
+
+
+import com.applexzs.backend.usersapp.models.entities.User;
+import com.applexzs.backend.usersapp.services.IUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @Autowired
+    private IUserService service;
+
+    @GetMapping
+    public List<User> list() {
+        return service.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> showById(@PathVariable Long id) {
+        Optional<User> userOptional = service.findById(id);
+        if (userOptional.isPresent()) {
+            return ResponseEntity.ok(userOptional.orElseThrow());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<?> create(@RequestBody User user) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
+    }
+
+    @PutMapping("/id")
+    public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
+        Optional op = service.update(user, id);
+        if (op.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(op.orElseThrow());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Optional<User> op = service.findById(id);
+        if (op.isPresent()) {
+            service.remove(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+}
