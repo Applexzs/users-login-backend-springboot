@@ -37,9 +37,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
 
-    @PutMapping("/id")
+    @PutMapping("/{id}")
     public ResponseEntity<?> update(@RequestBody User user, @PathVariable Long id) {
-        Optional op = service.update(user, id);
+        Optional<User> op = service.update(user, id);
         if (op.isPresent()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(op.orElseThrow());
         }

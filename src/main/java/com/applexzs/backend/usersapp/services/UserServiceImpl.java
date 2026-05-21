@@ -39,9 +39,9 @@ public class UserServiceImpl implements IUserService{
     @Override
     @Transactional
     public Optional<User> update(User user, Long id) {
-        Optional op = this.findById(id);
+        Optional<User> op = this.findById(id);
         if (op.isPresent()) {
-            User userDb = (User) op.orElseThrow();
+            User userDb = op.orElseThrow();
             userDb.setUsername(user.getUsername());
             userDb.setEmail(user.getEmail());
             userDb.setPassword(user.getPassword());
