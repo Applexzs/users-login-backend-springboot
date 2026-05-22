@@ -2,6 +2,10 @@ package com.applexzs.backend.usersapp.models.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -11,11 +15,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(unique = true)
+    @Size(min = 4, max = 12)
     private String username;
-
+    
+    @NotBlank
     private String password;
 
+    @Email
+    @NotEmpty
     @Column(unique = true)
     private String email;
 
