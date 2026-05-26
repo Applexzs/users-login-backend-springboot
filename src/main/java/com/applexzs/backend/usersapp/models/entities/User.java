@@ -17,7 +17,7 @@ public class User {
 
     @NotBlank
     @Column(unique = true)
-    @Size(min = 4, max = 12)
+    @Size(min = 4, max = 25)
     private String username;
     
     @NotBlank

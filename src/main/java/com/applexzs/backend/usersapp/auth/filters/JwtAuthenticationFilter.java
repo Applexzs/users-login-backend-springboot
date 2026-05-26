@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tools.jackson.databind.ObjectMapper;
 
+import static com.applexzs.backend.usersapp.auth.TokenJwtConfig.*;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -38,8 +39,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             username = user.getUsername();
             password = user.getPassword();
 
-            logger.info("Username desde request InputAStream (raw)" + username);
-            logger.info("Username desde request InputAStream (raw)" + password);
+//            logger.info("Username desde request InputAStream (raw)" + username);
+//            logger.info("Username desde request InputAStream (raw)" + password);
+
         } catch (IOException e) {
             e.printStackTrace(System.out);
         }
@@ -50,9 +52,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername();
-        String originalInput = "algun_token_con_alguna_frase" + username;
+        String originalInput = SECRET_KEY + "." + username;
         String token = Base64.getEncoder().encodeToString(originalInput.getBytes());
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
 
         Map<String, Object> body = new HashMap<>();
         body.put("token", token);
