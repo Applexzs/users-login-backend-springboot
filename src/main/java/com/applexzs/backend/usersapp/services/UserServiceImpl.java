@@ -4,6 +4,7 @@ import com.applexzs.backend.usersapp.models.entities.User;
 import com.applexzs.backend.usersapp.models.request.UserRequest;
 import com.applexzs.backend.usersapp.repositories.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,9 @@ public class UserServiceImpl implements IUserService{
 
     @Autowired
     private IUserRepository repository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -32,6 +36,8 @@ public class UserServiceImpl implements IUserService{
     @Override
     @Transactional
     public User save(User user) {
+        String passwordBC = passwordEncoder.encode(user.getPassword());
+        user.setPassword(passwordBC);
         return repository.save(user);
     }
 
