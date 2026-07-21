@@ -1,5 +1,6 @@
 package com.applexzs.backend.usersapp.services;
 
+import com.applexzs.backend.usersapp.models.IUser;
 import com.applexzs.backend.usersapp.models.dto.UserDto;
 import com.applexzs.backend.usersapp.models.dto.mapper.DtoMapperUser;
 import com.applexzs.backend.usersapp.models.entities.Role;
@@ -57,11 +58,9 @@ public class UserServiceImpl implements IUserService{
     public UserDto save(User user) {
         String passwordBC = passwordEncoder.encode(user.getPassword());
         user.setPassword(passwordBC);
-        Optional<Role> o = roleRepository.findByName("ROLE_USER");
-        List<Role> roles = new ArrayList<>();
-        if(o.isPresent()){
-            roles.add(o.orElseThrow());
-        }
+
+        List<Role> roles = getRoles(user);
+
         user.setRoles(roles);
         return DtoMapperUser.builder().setUser(repository.save(user)).build();
     }
@@ -70,19 +69,41 @@ public class UserServiceImpl implements IUserService{
     @Transactional
     public Optional<UserDto> update(UserRequest user, Long id) {
         Optional<User> op = repository.findById(id);
-        User userOptional = null;
+        User userUpdated = null;
         if (op.isPresent()) {
+
+            List<Role> roles = getRoles(user);
+
             User userDb = op.orElseThrow();
+            userDb.setRoles(roles);
             userDb.setUsername(user.getUsername());
             userDb.setEmail(user.getEmail());
-            Optional.of(repository.save(userDb));
+            userUpdated = repository.save(userDb);
         }
-        return Optional.ofNullable(DtoMapperUser.builder().setUser(userOptional).build());
+        if (userUpdated == null) {
+            return Optional.empty();
+        }
+        return Optional.of(DtoMapperUser.builder().setUser(userUpdated).build());
     }
 
     @Override
     @Transactional
     public void remove(Long id) {
         repository.deleteById(id);
+    }
+
+    private List<Role> getRoles(IUser user){
+        Optional<Role> ou = roleRepository.findByName("ROLE_USER");
+        List<Role> roles = new ArrayList<>();
+        if(ou.isPresent()){
+            roles.add(ou.orElseThrow());
+        }
+        if(user.isAdmin()) {
+            Optional<Role> oa = roleRepository.findByName("ROLE_ADMIN");
+            if(oa.isPresent()) {
+                roles.add(oa.orElseThrow());
+            }
+        }
+        return roles;
     }
 }

@@ -1,11 +1,12 @@
 package com.applexzs.backend.usersapp.models.request;
 
+import com.applexzs.backend.usersapp.models.IUser;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
-public class UserRequest {
+public class UserRequest implements IUser {
 
     @NotBlank
     @Size(min = 4, max = 12)
@@ -14,6 +15,8 @@ public class UserRequest {
     @Email
     @NotEmpty
     private String email;
+
+    private boolean admin;
 
     public String getUsername() {
         return username;
@@ -29,5 +32,14 @@ public class UserRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 }
