@@ -2,6 +2,8 @@ package com.applexzs.backend.usersapp.auth.filters;
 
 
 import com.applexzs.backend.usersapp.models.entities.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,12 +12,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tools.jackson.databind.ObjectMapper;
 
 import static com.applexzs.backend.usersapp.auth.TokenJwtConfig.*;
 import java.io.IOException;
-import java.util.Base64;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,8 +56,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String username = ((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername();
-        String originalInput = SECRET_KEY + "." + username;
-        String token = Base64.getEncoder().encodeToString(originalInput.getBytes());
+
+        Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
+        boolean isAdmin = roles.stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("authorities", new ObjectMapper().writeValueAsString(roles));
+        extraClaims.put("isAdmin", isAdmin);
+        extraClaims.put("username", username);
+
+        String token = Jwts.builder()
+                .claims(extraClaims)
+                .setSubject(username)
+                .signWith(SECRET_KEY)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                .compact();
+
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
 
         Map<String, Object> body = new HashMap<>();

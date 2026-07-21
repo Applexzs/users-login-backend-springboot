@@ -1,5 +1,6 @@
 package com.applexzs.backend.usersapp.services;
 
+import com.applexzs.backend.usersapp.models.dto.UserDto;
 import com.applexzs.backend.usersapp.models.entities.User;
 import com.applexzs.backend.usersapp.models.request.UserRequest;
 
@@ -8,13 +9,13 @@ import java.util.Optional;
 
 public interface IUserService {
 
-    List<User> findAll();
+    List<UserDto> findAll();
 
-    Optional<User> findById(Long id);
+    Optional<UserDto> findById(Long id);
 
-    User save(User user);
+    UserDto save(User user);
 
-    Optional<User> update(UserRequest user, Long id);
+    Optional<UserDto> update(UserRequest user, Long id);
 
     void remove(Long id);
 }

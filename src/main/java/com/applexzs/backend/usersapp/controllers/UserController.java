@@ -1,6 +1,7 @@
 package com.applexzs.backend.usersapp.controllers;
 
 
+import com.applexzs.backend.usersapp.models.dto.UserDto;
 import com.applexzs.backend.usersapp.models.entities.User;
 import com.applexzs.backend.usersapp.models.request.UserRequest;
 import com.applexzs.backend.usersapp.services.IUserService;
@@ -25,13 +26,13 @@ public class UserController {
     private IUserService service;
 
     @GetMapping
-    public List<User> list() {
+    public List<UserDto> list() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> showById(@PathVariable Long id) {
-        Optional<User> userOptional = service.findById(id);
+        Optional<UserDto> userOptional = service.findById(id);
         if (userOptional.isPresent()) {
             return ResponseEntity.ok(userOptional.orElseThrow());
         }
@@ -51,7 +52,7 @@ public class UserController {
         if(result.hasErrors()){
             return validation(result);
         }
-        Optional<User> op = service.update(user, id);
+        Optional<UserDto> op = service.update(user, id);
         if (op.isPresent()) {
             return ResponseEntity.status(HttpStatus.CREATED).body(op.orElseThrow());
         }
@@ -61,7 +62,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
-        Optional<User> op = service.findById(id);
+        Optional<UserDto> op = service.findById(id);
         if (op.isPresent()) {
             service.remove(id);
             return ResponseEntity.noContent().build();
